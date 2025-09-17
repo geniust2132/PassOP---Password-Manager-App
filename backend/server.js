@@ -130,84 +130,47 @@
 // Run with: node server.js
 // Or if you want auto-reload: node --watch server.js
 
-const express = require('express');
-const dotenv = require('dotenv');
-const { MongoClient } = require('mongodb');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-
-// Load environment variables from .env file
-dotenv.config();
-
-// MongoDB Atlas connection string from .env
-const url = process.env.MONGO_URI;
-const client = new MongoClient(url);
-
-// Database name (you already used "passop")
-const dbName = 'passop';
+// server.js
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const { MongoClient } = require("mongodb");
+require("dotenv").config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
-// Middlewares
-app.use(bodyParser.json());
+// Middleware
 app.use(cors());
+app.use(bodyParser.json());
 
-// Connect to MongoDB once at startup
+// MongoDB Connection
+let db;
 async function connectDB() {
   try {
+    const client = new MongoClient(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      tls: true,   // ensure TLS/SSL
+    });
+
     await client.connect();
-    console.log('✅ Connected to MongoDB Atlas');
+    db = client.db("PassopCluster"); // change if you created a custom db name
+    console.log("✅ Connected to MongoDB Atlas");
   } catch (err) {
-    console.error('❌ Error connecting to MongoDB:', err);
-    process.exit(1);
+    console.error("❌ Error connecting to MongoDB:", err);
+    process.exit(1); // stop server if db fails
   }
 }
-connectDB();
 
-// Routes
-
-// Get all passwords
-app.get('/', async (req, res) => {
-  try {
-    const db = client.db(dbName);
-    const collection = db.collection('passwords');
-    const findResult = await collection.find({}).toArray();
-    res.json(findResult);
-  } catch (err) {
-    console.error('Error fetching passwords:', err);
-    res.status(500).send({ error: 'Failed to fetch passwords' });
-  }
+// Example route
+app.get("/", (req, res) => {
+  res.send("🚀 Backend is running!");
 });
 
-// Save a password
-app.post('/', async (req, res) => {
-  try {
-    const password = req.body;
-    const db = client.db(dbName);
-    const collection = db.collection('passwords');
-    const result = await collection.insertOne(password);
-    res.send({ success: true, result });
-  } catch (err) {
-    console.error('Error saving password:', err);
-    res.status(500).send({ error: 'Failed to save password' });
-  }
+// Start server
+app.listen(PORT, async () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  await connectDB();
 });
 
-// Delete a password
-app.delete('/', async (req, res) => {
-  try {
-    const password = req.body;
-    const db = client.db(dbName);
-    const collection = db.collection('passwords');
-    const result = await collection.deleteOne(password);
-    res.send({ success: true, result });
-  } catch (err) {
-    console.error('Error deleting password:', err);
-    res.status(500).send({ error: 'Failed to delete password' });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
-});
