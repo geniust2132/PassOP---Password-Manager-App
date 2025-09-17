@@ -131,46 +131,66 @@
 // Or if you want auto-reload: node --watch server.js
 
 // server.js
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const { MongoClient } = require("mongodb");
-require("dotenv").config();
+const express = require('express');
+const env = require('dotenv').config();
+const { MongoClient } = require('mongodb');
+const bodyparser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const url = process.env.MONGO_URI; // Mongo URI includes /passop
+const client = new MongoClient(url);
 
-// Middleware
+app.use(bodyparser.json());
 app.use(cors());
-app.use(bodyParser.json());
 
-// MongoDB Connection
-let db;
+// Connect once at startup
 async function connectDB() {
   try {
-    const client = new MongoClient(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      tls: true,   // ensure TLS/SSL
-    });
-
     await client.connect();
-    db = client.db("PassopCluster"); // change if you created a custom db name
     console.log("✅ Connected to MongoDB Atlas");
   } catch (err) {
-    console.error("❌ Error connecting to MongoDB:", err);
-    process.exit(1); // stop server if db fails
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1); // stop server if DB fails
   }
 }
+connectDB();
 
-// Example route
-app.get("/", (req, res) => {
-  res.send("🚀 Backend is running!");
+app.get('/', async (req, res) => {
+  try {
+    const collection = client.db().collection('passwords'); // no dbName needed
+    const result = await collection.find({}).toArray();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Start server
-app.listen(PORT, async () => {
+app.post('/', async (req, res) => {
+  try {
+    const password = req.body;
+    const collection = client.db().collection('passwords');
+    const result = await collection.insertOne(password);
+    res.send({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/', async (req, res) => {
+  try {
+    const password = req.body;
+    const collection = client.db().collection('passwords');
+    const result = await collection.deleteOne(password);
+    res.send({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  await connectDB();
 });
+
 
