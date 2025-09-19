@@ -166,6 +166,27 @@ app.get('/', async (req, res) => {
   }
 });
 
+// update route
+app.put('/', async (req, res) => {
+  try {
+    const { id, site, username, password } = req.body;
+    if (!id) return res.status(400).json({ error: 'id required' });
+
+    const collection = client.db().collection('passwords');
+    const result = await collection.updateOne(
+      { id: id },
+      { $set: { site, username, password } },
+      { upsert: false } // do not create new document when updating
+    );
+
+    res.json({ success: true, result });
+  } catch (err) {
+    console.error('PUT / error', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 app.post('/', async (req, res) => {
   try {
     const password = req.body;
@@ -177,13 +198,29 @@ app.post('/', async (req, res) => {
   }
 });
 
+// app.delete('/', async (req, res) => {
+//   try {
+//     const password = req.body;
+//     const collection = client.db().collection('passwords');
+//     const result = await collection.deleteOne(password);
+//     res.send({ success: true, result });
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
+// safer delete route (delete by id only)
 app.delete('/', async (req, res) => {
   try {
-    const password = req.body;
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'id required' });
+
+    console.log('DELETE payload id:', id); // for debugging
     const collection = client.db().collection('passwords');
-    const result = await collection.deleteOne(password);
-    res.send({ success: true, result });
+    const result = await collection.deleteOne({ id: id });
+    res.json({ success: true, result });
   } catch (err) {
+    console.error('DELETE / error', err);
     res.status(500).json({ error: err.message });
   }
 });

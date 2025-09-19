@@ -1,3 +1,6 @@
+const API_BASE = "https://passop-backend-rgfb.onrender.com"; // your render url
+
+
 import React from 'react'
 import { useRef, useState, useEffect } from 'react';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
@@ -43,86 +46,158 @@ const Manager = () => {
 
     }
 
+    // const savePassword = async () => {
+    //     if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
+
+    //         //If any such id exists in the db delete it
+    //         await fetch("https://passop-backend-rgfb.onrender.com", {
+    //             method: "DELETE", headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify({id: form.id })
+    //         })
+
+
+
+
+    //         setPasswordArray([...passwordArray, { ...form, id: uuidv4() }])
+
+    //         await fetch("https://passop-backend-rgfb.onrender.com", {
+    //             method: "POST", headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify({ ...form, id: uuidv4() })
+    //         })
+
+
+    //         // localStorage.setItem("passwords", JSON.stringify([...passwordArray, { ...form, id: uuidv4() }]))
+    //         // console.log([...passwordArray, form])
+    //         setform({ site: "", username: "", password: "" })
+    //         toast('Password Saved!', {
+    //             position: "top-right",
+    //             autoClose: 5000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: true,
+    //             progress: undefined,
+    //             theme: "light",
+    //             transition: Bounce,
+    //         });
+    //     }
+    //     else {
+    //         toast('Error: Password Not Saved!', {
+    //             position: "top-right",
+    //             autoClose: 5000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: true,
+    //             progress: undefined,
+    //             theme: "light",
+    //             transition: Bounce,
+    //         });
+    //     }
+    // }
+
     const savePassword = async () => {
-        if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
-
-            //If any such id exists in the db delete it
-            await fetch("https://passop-backend-rgfb.onrender.com", {
-                method: "DELETE", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({id: form.id })
-            })
-
-
-
-
-            setPasswordArray([...passwordArray, { ...form, id: uuidv4() }])
-
-            await fetch("https://passop-backend-rgfb.onrender.com", {
-                method: "POST", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...form, id: uuidv4() })
-            })
-
-
-            // localStorage.setItem("passwords", JSON.stringify([...passwordArray, { ...form, id: uuidv4() }]))
-            // console.log([...passwordArray, form])
-            setform({ site: "", username: "", password: "" })
-            toast('Password Saved!', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Bounce,
-            });
+        // basic validation
+        if (!(form.site.length > 3 && form.username.length > 3 && form.password.length > 3)) {
+            toast('Error: Password Not Saved!', { /* toast options */ });
+            return;
         }
-        else {
-            toast('Error: Password Not Saved!', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Bounce,
+
+        // If form.id exists → editing. Otherwise create new id and insert.
+        if (form.id) {
+            // editing: call PUT
+            const payload = { id: form.id, site: form.site, username: form.username, password: form.password };
+
+            const res = await fetch(`${API_BASE}/`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
             });
+
+            if (res.ok) {
+                toast('Password Updated!', { /* options */ });
+                // re-sync from server
+                await getPasswords();
+                setform({ site: "", username: "", password: "" });
+            } else {
+                toast('Error updating password!');
+            }
+
+        } else {
+            // creating new: generate id once and use it both in state and in DB
+            const newId = uuidv4();
+            const payload = { ...form, id: newId };
+
+            // POST to backend
+            const res = await fetch(`${API_BASE}/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                toast('Password Saved!', { /* options */ });
+                // re-sync from server (recommended) or append payload to state
+                await getPasswords(); // keep UI consistent with DB
+                setform({ site: "", username: "", password: "" });
+            } else {
+                toast('Error saving password!');
+            }
         }
     }
+
+
+    // const deletePassword = async (id) => {
+    //     let c = confirm("Do You Want To Delete?")
+    //     if (c) {
+    //         // console.log("deleting password using id", id)
+    //         setPasswordArray(passwordArray.filter(item => item.id !== id))
+    //         // localStorage.setItem("passwords", JSON.stringify(passwordArray.filter(item => item.id !== id)))
+    //         let res = await fetch("https://passop-backend-rgfb.onrender.com", {
+    //             method: "DELETE", headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify({ id })
+    //         })
+
+    //         toast('Password Deleted!', {
+    //             position: "top-right",
+    //             autoClose: 5000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: true,
+    //             progress: undefined,
+    //             theme: "dark",
+    //             transition: Bounce,
+    //         });
+    //     }
+
+    // }
 
     const deletePassword = async (id) => {
-        let c = confirm("Do You Want To Delete?")
-        if (c) {
-            // console.log("deleting password using id", id)
-            setPasswordArray(passwordArray.filter(item => item.id !== id))
-            // localStorage.setItem("passwords", JSON.stringify(passwordArray.filter(item => item.id !== id)))
-            let res = await fetch("https://passop-backend-rgfb.onrender.com", {
-                method: "DELETE", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id })
-            })
+        const c = confirm("Do You Want To Delete?");
+        if (!c) return;
 
-            toast('Password Deleted!', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-                transition: Bounce,
-            });
+        // call backend to delete by id
+        const res = await fetch(`${API_BASE}/`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id })
+        });
+
+        if (res.ok) {
+            toast('Password Deleted!', { /* options */ });
+            // re-sync
+            await getPasswords();
+        } else {
+            toast('Error deleting password!');
         }
-
     }
+
 
     const editPassword = (id) => {
 
         console.log("edit password using id", id)
-        setform({...passwordArray.filter(i => i.id === id)[0],id: id})
+        setform({ ...passwordArray.filter(i => i.id === id)[0], id: id })
         setPasswordArray(passwordArray.filter(item => item.id !== id))
 
     }
