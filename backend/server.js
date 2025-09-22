@@ -136,6 +136,9 @@ const env = require('dotenv').config();
 const { MongoClient } = require('mongodb');
 const bodyparser = require('body-parser');
 const cors = require('cors');
+require("dotenv").config();
+const mongoose = require("mongoose");
+
 
 const app = express();
 const url = process.env.MONGO_URI; // Mongo URI includes /passop
@@ -143,6 +146,30 @@ const client = new MongoClient(url);
 
 app.use(bodyparser.json());
 app.use(cors());
+app.use(express.json());
+app.use("/api/passwords", require("./routes/passwordRoutes"));
+
+
+// ✅ Connect to MongoDB Atlas with Mongoose
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ Mongoose connected to Atlas"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
+
+// ✅ Mount routes
+app.use("/api/auth", require("./routes/authRoutes"));
+
+// test route
+app.get("/", (req, res) => {
+  res.send("Backend is running ✅");
+});
+
 
 // Connect once at startup
 async function connectDB() {
@@ -156,7 +183,7 @@ async function connectDB() {
 }
 connectDB();
 
-app.get('/', async (req, res) => {
+app.get("/api/passwords", async (req, res) => {
   try {
     const collection = client.db().collection('passwords'); // no dbName needed
     const result = await collection.find({}).toArray();
@@ -167,7 +194,7 @@ app.get('/', async (req, res) => {
 });
 
 // update route
-app.put('/', async (req, res) => {
+app.put("/api/passwords", async (req, res) => {
   try {
     const { id, site, username, password } = req.body;
     if (!id) return res.status(400).json({ error: 'id required' });
@@ -187,7 +214,7 @@ app.put('/', async (req, res) => {
 });
 
 
-app.post('/', async (req, res) => {
+app.post("/api/passwords", async (req, res) => {
   try {
     const password = req.body;
     const collection = client.db().collection('passwords');
@@ -210,7 +237,7 @@ app.post('/', async (req, res) => {
 // });
 
 // safer delete route (delete by id only)
-app.delete('/', async (req, res) => {
+app.delete("/api/passwords", async (req, res) => {
   try {
     const { id } = req.body;
     if (!id) return res.status(400).json({ error: 'id required' });

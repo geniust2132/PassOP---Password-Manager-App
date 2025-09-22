@@ -10,20 +10,36 @@ import { v4 as uuidv4 } from 'uuid';
 const Manager = () => {
     const ref = useRef()
     const passwordRef = useRef()
-    const [form, setform] = useState({ site: "", username: "", password: "" })
+    const [form, setform] = useState({ site: "", username: "", password: "", id: "" })
 
     const [passwordArray, setPasswordArray] = useState([])
 
+    //these 4 line of code is being added as a helper and written when auth is being introduced in the project 
+    const authHeaders = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+    };
+
     const getPasswords = async () => {
-        let req = await fetch("https://passop-backend-rgfb.onrender.com")
+        // let req = await fetch("https://passop-backend-rgfb.onrender.com")
         // let req = await fetch("http://localhost:3000/")
         // let req = await fetch("http://localhost:3000/passwords")
 
-        let passwords = await req.json()
-        console.log(passwords)
-        setPasswordArray(passwords)
-
-    }
+        try {
+            const req = await fetch(`${API_BASE}/api/passwords`, { headers: authHeaders });
+            if (req.status === 401) {
+                toast.error("Session expired, please log in again");
+                localStorage.removeItem("token");
+                window.location.href = "/login"; // redirect to login
+                return;
+            }
+            const passwords = await req.json();
+            setPasswordArray(passwords);
+        } catch (err) {
+            console.error(err);
+            toast.error("Error fetching passwords");
+        }
+    };
 
     useEffect(() => {
         getPasswords()
@@ -98,27 +114,27 @@ const Manager = () => {
 
     const savePassword = async () => {
         // basic validation
-        if (!(form.site.length > 3 && form.username.length > 3 && form.password.length > 3)) {
-            toast('Error: Password Not Saved!', { /* toast options */ });
+        if (!(form.site && form.username && form.password)) {
+            toast.error("All fields are required");
             return;
         }
 
         // If form.id exists → editing. Otherwise create new id and insert.
         if (form.id) {
             // editing: call PUT
-            const payload = { id: form.id, site: form.site, username: form.username, password: form.password };
+            // const payload = { id: form.id, site: form.site, username: form.username, password: form.password };
 
-            const res = await fetch(`${API_BASE}/`, {
+            const res = await fetch(`${API_BASE}/api/passwords/${form.id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+                headers: authHeaders,
+                body: JSON.stringify({ site: form.site, username: form.username, password: form.password }),
             });
 
             if (res.ok) {
-                toast('Password Updated!', { /* options */ });
+                toast.success("Password Updated!");
                 // re-sync from server
                 await getPasswords();
-                setform({ site: "", username: "", password: "" });
+                setform({ site: "", username: "", password: "", id: "" });
             } else {
                 toast('Error updating password!');
             }
@@ -129,19 +145,19 @@ const Manager = () => {
             const payload = { ...form, id: newId };
 
             // POST to backend
-            const res = await fetch(`${API_BASE}/`, {
+            const res = await fetch(`${API_BASE}/api/passwords`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: authHeaders,
                 body: JSON.stringify(payload)
             });
 
             if (res.ok) {
-                toast('Password Saved!', { /* options */ });
+                toast.success("Password Saved!");
                 // re-sync from server (recommended) or append payload to state
                 await getPasswords(); // keep UI consistent with DB
-                setform({ site: "", username: "", password: "" });
+                setform({ site: "", username: "", password: "", id: "" });
             } else {
-                toast('Error saving password!');
+                toast.error("Error saving password!");
             }
         }
     }
@@ -178,28 +194,27 @@ const Manager = () => {
         if (!c) return;
 
         // call backend to delete by id
-        const res = await fetch(`${API_BASE}/`, {
+        const res = await fetch(`${API_BASE}/api/passwords/${id}`, {
             method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id })
+            headers: authHeaders,
+            // body: JSON.stringify({ id })
         });
 
         if (res.ok) {
-            toast('Password Deleted!', { /* options */ });
+            toast.success("Password Deleted!");
             // re-sync
             await getPasswords();
         } else {
-            toast('Error deleting password!');
+            toast.error("Error deleting password!");
         }
     }
 
 
     const editPassword = (id) => {
-
-        console.log("edit password using id", id)
-        setform({ ...passwordArray.filter(i => i.id === id)[0], id: id })
-        setPasswordArray(passwordArray.filter(item => item.id !== id))
-
+    const item = passwordArray.find(i => i.id === id);
+        if (item) {
+            setform(item);
+        }
     }
 
     const handleChange = (e) => {
