@@ -17,6 +17,12 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (form.password.length < 8 || !/[0-9]/.test(form.password)) {
+    toast.error("Password must be at least 8 characters and include a number");
+    return;
+  }
+
+
     try {
       const res = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
