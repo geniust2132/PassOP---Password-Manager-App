@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -7,6 +8,7 @@ const API_BASE = "https://passop-backend-rgfb.onrender.com";
 
 const Register = () => {
   const [form, setForm] = useState({ username: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,6 +27,7 @@ const Register = () => {
       if (res.ok) {
         toast.success("Registration successful! Please log in.");
         setForm({ username: "", password: "" });
+        navigate("/login"); // redirect to login page
       } else {
         const data = await res.json();
         toast.error(data.error || "Registration failed");
@@ -64,6 +67,18 @@ const Register = () => {
 
         </button>
       </form>
+
+      {/* Login button */}
+      <p className="mt-4">
+        Already have an account?{" "}
+        <button
+          onClick={() => navigate("/login")}
+          className="text-blue-600 underline"
+        >
+          Go to Login
+        </button>
+      </p>
+
     </div>
   );
 };
