@@ -66,7 +66,7 @@ const Register = () => {
         />
         <button
           type="submit"
-          className="bg-green-500 hover:bg-green-400 text-white py-2 rounded"
+          className="bg-green-500 hover:bg-green-400 text-white py-2 rounded cursor-pointer"
         >
 
           Register
@@ -79,9 +79,9 @@ const Register = () => {
         Already have an account?{" "}
         <button
           onClick={() => navigate("/login")}
-          className="text-blue-600 underline"
+          className="text-blue-600 underline cursor-pointer"
         >
-          Go to Login
+          Log In 
         </button>
       </p>
 

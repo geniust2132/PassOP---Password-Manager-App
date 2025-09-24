@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
 const API_BASE = "https://passop-backend-rgfb.onrender.com";
 
 const Login = () => {
   const [form, setForm] = useState({ username: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,7 +27,8 @@ const Login = () => {
         const data = await res.json();
         localStorage.setItem("token", data.token);
         toast.success("Login successful!");
-        window.location.href = "/"; // redirect to home / manager
+        // window.location.href = "/"; // redirect to home / manager
+        navigate("/manager");
       } else {
         const data = await res.json();
         toast.error(data.error || "Login failed");
@@ -58,7 +61,7 @@ const Login = () => {
         />
         <button
           type="submit"
-          className="bg-green-500 hover:bg-green-400 text-white py-2 rounded"
+          className="bg-green-500 hover:bg-green-400 text-white py-2 rounded cursor-pointer"
         >
           Login
         </button>
