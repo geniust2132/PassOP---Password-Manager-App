@@ -39,6 +39,11 @@ const Login = () => {
   };
 
   return (
+    <main className=" bg-green-100 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] min-h-[calc(100vh-120px)]
+                flex flex-col 
+                items-center 
+                justify-center 
+                pt-12">
     <div className="flex flex-col h-full items-center justify-center bg-green-100">
       <div className="p-6 max-w-md w-full bg-white rounded shadow">
         <ToastContainer />
@@ -69,6 +74,7 @@ const Login = () => {
         </form>
       </div>
     </div>
+    </main>
   );
 };
 

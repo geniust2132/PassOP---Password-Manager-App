@@ -5,6 +5,11 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
+    <main className=" bg-green-100 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] min-h-[calc(100vh-120px)]
+                flex flex-col 
+                items-center 
+                justify-center 
+                pt-12">
     <div className="flex flex-col items-center justify-center h-full bg-green-100">
       <h1 className="text-4xl font-bold">Welcome To</h1>
       <h1 className="text-4xl font-bold mb-6">PassOP 🔐</h1>
@@ -24,6 +29,7 @@ const Landing = () => {
         </button>
       </div>
     </div>
+    </main>
   );
 };
 

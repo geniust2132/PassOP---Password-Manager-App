@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import React from 'react'
 import './App.css'
 import Navbar from './components/Navbar'
@@ -13,42 +14,44 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 function App() {
   return (
     <Router>
-      {/* Root wrapper */}
-      <div className="flex flex-col min-h-screen">
-        {/* Navbar */}
-        <Navbar />
+      <Navbar />
+      {/* <div className='min-h-[68vh]'> */}
+      <div className='bg-green-100 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] min-h-[68vh]'>
 
-        {/* Main content (fills leftover space) */}
-        <main className=" bg-green-100 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] min-h-[calc(100vh-120px)]
+
+      {/* <main className=" bg-green-100 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] min-h-[calc(100vh-120px)]
                 flex flex-col 
                 items-center 
                 justify-center 
-                pt-12">
-          <Routes>
-            {/* Home → Landing */}
-            <Route path="/" element={<Landing />} />
+                pt-12"></main> */}
 
-            {/* Auth routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+        <Routes>
 
-            {/* Protected Manager route */}
-            <Route
-              path="/manager"
-              element={
-                <ProtectedRoute>
-                  <Manager />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </main>
+          {/* Home → Landing */}
+          <Route path="/" element={<Landing />} />
+          
+          {/* Auth routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          
+          {/* <Route path="/manager" element={<Manager />} /> */}
 
-        {/* Footer */}
-        <Footer />
+          {/* Protected Manager route */}
+          <Route
+            path="/manager"
+            element={
+              <ProtectedRoute>
+                <Manager />
+              </ProtectedRoute>
+            }
+          />
+
+        </Routes>
       </div>
+
+      <Footer />
     </Router>
   );
 }
 
-export default App;
+export default App
