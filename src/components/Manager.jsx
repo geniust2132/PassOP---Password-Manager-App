@@ -57,7 +57,7 @@ const Manager = () => {
         }
         else {
             passwordRef.current.type = "text"
-            ref.current.src.includes ("public/eyecross.png")
+            ref.current.src = "public/eyecross.png"
         }
 
     }
