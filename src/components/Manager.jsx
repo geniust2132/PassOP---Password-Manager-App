@@ -374,35 +374,32 @@ const Manager = () => {
                     <h2 className="font-bold text-xl py-1">Your Passwords</h2>
                     {passwordArray.length === 0 && <div>No Passwords To Show</div>}
                     {passwordArray.length !== 0 && (
-                        <table className="table-auto w-full rounded-md overflow-hidden mb-2">
+                        <table className="table-fixed w-full rounded-md overflow-hidden mb-2">
                             <thead className="bg-green-800 text-white text-sm">
                                 <tr>
-                                    <th className="py-2">Site</th>
-                                    <th className="py-2">Username</th>
-                                    <th className="py-2">Password</th>
-                                    <th className="py-2">Actions</th>
+                                    <th className="py-2 w-[30%]">Site</th>      {/* ✅ fixed width for equal balance */}
+                                    <th className="py-2 w-[25%]">Username</th>  {/* ✅ keeps columns consistent */}
+                                    <th className="py-2 w-[25%]">Password</th>
+                                    <th className="py-2 w-[20%]">Actions</th>   {/* ✅ ensures actions never cut */}
                                 </tr>
                             </thead>
                             <tbody className="bg-green-200 text-sm">
                                 {passwordArray.map((item, index) => (
                                     <tr key={index}>
                                         {/* ✅ Site column */}
-                                        <td className="py-2 border border-white text-center">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <div
-                                                    className="max-w-[100px] overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-400"
-                                                /* ✅ max width + horizontal scroll only inside this cell */
+                                        <td className="py-2 border border-white">
+                                            <div className="flex items-center justify-between gap-2 px-2">
+                                                <a
+                                                    href={item.site}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-full overflow-x-auto whitespace-nowrap block"
+                                                /* ✅ link fills whole space, scrolls horizontally */
                                                 >
-                                                    <a
-                                                        href={item.site}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                    >
-                                                        {item.site}
-                                                    </a>
-                                                </div>
+                                                    {item.site}
+                                                </a>
                                                 <div
-                                                    className="lordcopy cursor-pointer"
+                                                    className="lordcopy cursor-pointer flex-shrink-0"
                                                     onClick={() => copyText(item.site)}
                                                 >
                                                     <lord-icon
@@ -416,36 +413,36 @@ const Manager = () => {
 
                                         {/* ✅ Username column */}
                                         <td className="py-2 border border-white text-center">
-                                            <div
-                                                className="max-w-[100px] overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-400"
-                                            /* ✅ username scrollable inside cell */
-                                            >
+                                            <div className="overflow-x-auto whitespace-nowrap inline-block max-w-[100px]">
                                                 {item.username}
                                             </div>
                                         </td>
 
                                         {/* ✅ Password column */}
                                         <td className="py-2 border border-white text-center">
-                                            <div
-                                                className="max-w-[100px] overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-400"
-                                            /* ✅ password scrollable inside cell */
-                                            >
+                                            <div className="overflow-x-auto whitespace-nowrap inline-block max-w-[100px]">
                                                 {"*".repeat(item.password.length)}
                                             </div>
                                         </td>
 
-                                        {/* ✅ Actions column (no scroll needed) */}
+                                        {/* ✅ Actions column */}
                                         <td className="py-2 border border-white text-center">
-                                            <span className="cursor-pointer" onClick={() => editPassword(item.id)}>
+                                            <span
+                                                className="cursor-pointer inline-block mx-1"
+                                                onClick={() => editPassword(item.id)}
+                                            >
                                                 <lord-icon
-                                                    style={{ width: "25px", height: "25px", paddingTop: "3px" }}
+                                                    style={{ width: "25px", height: "25px" }}
                                                     src="https://cdn.lordicon.com/gwlusjdu.json"
                                                     trigger="hover"
                                                 />
                                             </span>
-                                            <span className="cursor-pointer" onClick={() => deletePassword(item.id)}>
+                                            <span
+                                                className="cursor-pointer inline-block mx-1"
+                                                onClick={() => deletePassword(item.id)}
+                                            >
                                                 <lord-icon
-                                                    style={{ width: "25px", height: "25px", paddingTop: "3px" }}
+                                                    style={{ width: "25px", height: "25px" }}
                                                     src="https://cdn.lordicon.com/skkahier.json"
                                                     trigger="hover"
                                                 />
@@ -455,6 +452,7 @@ const Manager = () => {
                                 ))}
                             </tbody>
                         </table>
+
                     )}
                 </div>
 
