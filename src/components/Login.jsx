@@ -39,33 +39,35 @@ const Login = () => {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <ToastContainer />
-      <h2 className="text-2xl font-bold mb-4">Login</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          name="username"
-          value={form.username}
-          onChange={handleChange}
-          type="text"
-          placeholder="Username"
-          className="border p-2 rounded"
-        />
-        <input
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          type="password"
-          placeholder="Password"
-          className="border p-2 rounded"
-        />
-        <button
-          type="submit"
-          className="bg-green-500 hover:bg-green-400 text-white py-2 rounded cursor-pointer"
-        >
-          Login
-        </button>
-      </form>
+    <div className="flex flex-col h-full items-center justify-center bg-green-100">
+      <div className="p-6 max-w-md w-full bg-white rounded shadow">
+        <ToastContainer />
+        <h2 className="text-2xl font-bold mb-4">Login</h2>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <input
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            type="text"
+            placeholder="Username"
+            className="border p-2 rounded"
+          />
+          <input
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            type="password"
+            placeholder="Password"
+            className="border p-2 rounded"
+          />
+          <button
+            type="submit"
+            className="bg-green-500 hover:bg-green-400 text-white py-2 rounded cursor-pointer"
+          >
+            Login
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

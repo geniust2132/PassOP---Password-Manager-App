@@ -5,8 +5,9 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-green-100">
-      <h1 className="text-4xl font-bold mb-6">Welcome to PassOP 🔐</h1>
+    <div className="flex flex-col items-center justify-center h-full bg-green-100">
+      <h1 className="text-4xl font-bold">Welcome To</h1>
+      <h1 className="text-4xl font-bold mb-6">PassOP 🔐</h1>
       <p className="mb-8 text-lg">Your personal password manager.</p>
       <div className="flex gap-4">
         <button
